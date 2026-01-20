@@ -90,19 +90,21 @@ export function FileUpload({ value, onChange, type = "video", accept, label = "U
                             size="icon"
                             className="text-muted-foreground hover:text-destructive"
                             onClick={handleRemove}
+                            aria-label="Remove file"
                         >
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
             ) : (
-                <div className="border-2 border-dashed rounded-lg p-6 hover:bg-muted/50 transition-colors text-center relative">
+                <div className="border-2 border-dashed rounded-lg p-6 hover:bg-muted/50 transition-colors text-center relative focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                     <input
                         type="file"
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         onChange={handleFileSelect}
                         accept={accept || (type === "video" ? "video/*" : "*")}
                         disabled={uploading}
+                        aria-label={label}
                     />
                     <div className="flex flex-col items-center gap-2">
                         <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center">
@@ -122,7 +124,7 @@ export function FileUpload({ value, onChange, type = "video", accept, label = "U
                     )}
                 </div>
             )}
-            {error && <p className="text-xs text-destructive mt-2">{error}</p>}
+            {error && <p className="text-xs text-destructive mt-2" role="alert">{error}</p>}
         </div>
     );
 }
