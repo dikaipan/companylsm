@@ -1,0 +1,27 @@
+
+> api@0.0.1 test
+> jest src/discussions/discussions.controller.spec.ts
+
+PASS src/discussions/discussions.controller.spec.ts
+  DiscussionsController
+    √ should be defined (11 ms)
+    create
+      √ should create a discussion post (4 ms)
+    findByCourse
+      √ should return discussions for a course (2 ms)
+    findOne
+      √ should return a single discussion (2 ms)
+      √ should return error if not found (1 ms)
+    reply
+      √ should create a reply to a discussion (1 ms)
+      √ should return error if parent not found (1 ms)
+    delete
+      √ should allow owner to delete their post (2 ms)
+      √ should allow admin to delete any post (1 ms)
+      √ should not allow non-owner non-admin to delete (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        1.04 s
+Ran all test suites matching src/discussions/discussions.controller.spec.ts.

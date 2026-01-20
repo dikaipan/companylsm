@@ -1,0 +1,73 @@
+
+> api@0.0.1 test
+> jest src/discussions/discussions.controller.spec.ts
+
+FAIL src/discussions/discussions.controller.spec.ts
+  DiscussionsController
+    √ should be defined (9 ms)
+    create
+      √ should create a discussion post (3 ms)
+    findByCourse
+      √ should return discussions for a course (2 ms)
+    findOne
+      √ should return a single discussion (2 ms)
+      √ should return error if not found (2 ms)
+    reply
+      √ should create a reply to a discussion (1 ms)
+      √ should return error if parent not found (1 ms)
+    delete
+      × should allow owner to delete their post (4 ms)
+      × should allow admin to delete any post (2 ms)
+      √ should not allow non-owner non-admin to delete (2 ms)
+
+  ● DiscussionsController › delete › should allow owner to delete their post
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 2
+
+      Object {
+    -   "message": "Discussion deleted",
+    +   "id": "disc-1",
+    +   "userId": "user-1",
+      }
+
+    [0m [90m 183 |[39m
+     [90m 184 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m controller[33m.[39m[36mdelete[39m([32m'disc-1'[39m[33m,[39m { user[33m:[39m mockUser })[33m;[39m
+    [31m[1m>[22m[39m[90m 185 |[39m       expect(result)[33m.[39mtoEqual({ message[33m:[39m [32m'Discussion deleted'[39m })[33m;[39m
+     [90m     |[39m                      [31m[1m^[22m[39m
+     [90m 186 |[39m     })[33m;[39m
+     [90m 187 |[39m
+     [90m 188 |[39m     it([32m'should allow admin to delete any post'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:185:22)
+
+  ● DiscussionsController › delete › should allow admin to delete any post
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 2
+
+      Object {
+    -   "message": "Discussion deleted",
+    +   "id": "disc-1",
+    +   "userId": "other-user",
+      }
+
+    [0m [90m 192 |[39m
+     [90m 193 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m controller[33m.[39m[36mdelete[39m([32m'disc-1'[39m[33m,[39m { user[33m:[39m mockAdmin })[33m;[39m
+    [31m[1m>[22m[39m[90m 194 |[39m       expect(result)[33m.[39mtoEqual({ message[33m:[39m [32m'Discussion deleted'[39m })[33m;[39m
+     [90m     |[39m                      [31m[1m^[22m[39m
+     [90m 195 |[39m     })[33m;[39m
+     [90m 196 |[39m
+     [90m 197 |[39m     it([32m'should not allow non-owner non-admin to delete'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:194:22)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 8 passed, 10 total
+Snapshots:   0 total
+Time:        0.982 s
+Ran all test suites matching src/discussions/discussions.controller.spec.ts.

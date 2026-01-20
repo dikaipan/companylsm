@@ -1,0 +1,450 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  role      Role     @default(STUDENT)
+  divisionId String?
+  division   Division? @relation(fields: [divisionId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses       Course[]      @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  assignments   Submission[]
+  certificates  Certificate[]
+  reviews       Review[]
+  discussions   Discussion[]  @relation("UserDiscussions")
+  lessonProgress LessonProgress[]
+  quizAttempts  QuizAttempt[]
+  notifications Notification[]
+  badges        UserBadge[]
+  sentMessages      ChatMessage[]   @relation("SentMessages")
+  receivedMessages  ChatMessage[]   @relation("ReceivedMessages")
+  readingProgress   ReadingProgress[]
+  libraryActivity   LibraryActivity[]
+}
+
+model Course {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  thumbnail    String?
+  price        Decimal?     @default(0)
+  status       CourseStatus @default(DRAFT)
+  instructorId String
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryId   String?
+  category     Category?    @relation(fields: [categoryId], references: [id])
+  duration     String?      // e.g., "2h", "3 hours"
+  level        String?      @default("Beginner") // Beginner, Intermediate, Advanced
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  modules      Module[]
+  enrollments  Enrollment[]
+  reviews      Review[]
+  certificates Certificate[]
+  discussions  Discussion[]
+  tags         CourseTag[]
+  quizzes      Quiz[]
+  divisions    CourseDivision[]
+}
+
+model Category {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  courses Course[]
+}
+
+model Module {
+  id       String    @id @default(uuid())
+  title    String
+  order    Int
+  courseId String
+  course   Course    @relation(fields: [courseId], references: [id])
+  lessons  Lesson[]
+}
+
+model Lesson {
+  id           String   @id @default(uuid())
+  title        String
+  videoUrl     String?
+  content      String?  @db.Text // Rich text or markdown
+  order        Int
+  moduleId     String
+  module       Module   @relation(fields: [moduleId], references: [id])
+  
+  attachments  Attachment[]
+  assignments  Assignment[]
+  progress     LessonProgress[]
+  quizzes      Quiz[]
+}
+
+model Quiz {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  passingScore Int     @default(70) // Minimum percentage to pass
+  timeLimit   Int?     // Time limit in minutes (optional)
+  lessonId    String?
+  lesson      Lesson?  @relation(fields: [lessonId], references: [id])
+  courseId    String?
+  course      Course?  @relation(fields: [courseId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  questions   Question[]
+  attempts    QuizAttempt[]
+}
+
+model Question {
+  id          String   @id @default(uuid())
+  text        String   @db.Text
+  order       Int      @default(0)
+  points      Int      @default(1)
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  
+  options     QuestionOption[]
+  answers     QuizAnswer[]
+}
+
+model QuestionOption {
+  id          String   @id @default(uuid())
+  text        String
+  isCorrect   Boolean  @default(false)
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  answers     QuizAnswer[]
+}
+
+model QuizAttempt {
+  id          String   @id @default(uuid())
+  score       Float?
+  passed      Boolean  @default(false)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  
+  answers     QuizAnswer[]
+}
+
+model QuizAnswer {
+  id          String   @id @default(uuid())
+  attemptId   String
+  attempt     QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId  String
+  question    Question    @relation(fields: [questionId], references: [id])
+  optionId    String?
+  option      QuestionOption? @relation(fields: [optionId], references: [id])
+  
+  @@unique([attemptId, questionId])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+}
+
+model Assignment {
+  id        String   @id @default(uuid())
+  title     String
+  dueDate   DateTime?
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  
+  submissions Submission[]
+}
+
+model Submission {
+  id           String     @id @default(uuid())
+  content      String?
+  fileUrl      String?
+  score        Float?
+  feedback     String?
+  submittedAt  DateTime   @default(now())
+  
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+}
+
+model LessonProgress {
+  id        String   @id @default(uuid())
+  completed Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  @@unique([userId, lessonId])
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  progress  Float    @default(0) // Percentage
+  enrolledAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model Certificate {
+  id        String   @id @default(uuid())
+  url       String
+  issuedAt  DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Discussion {
+  id        String   @id @default(uuid())
+  content   String
+  parentId  String?
+  parent    Discussion? @relation("DiscussionThread", fields: [parentId], references: [id])
+  replies   Discussion[] @relation("DiscussionThread")
+  
+  userId    String
+  user      User     @relation("UserDiscussions", fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id      String      @id @default(uuid())
+  name    String      @unique
+  courses CourseTag[]
+}
+
+model CourseTag {
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+  tagId    String
+  tag      Tag    @relation(fields: [tagId], references: [id])
+  
+  @@id([courseId, tagId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String   @db.Text
+  type      String   @default("info") // info, success, warning, error
+  link      String?  // Optional link to navigate to
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Division {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String?  @unique
+  createdAt DateTime @default(now())
+  
+  users     User[]
+  courses   CourseDivision[]
+}
+
+model CourseDivision {
+  courseId    String
+  course      Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  divisionId  String
+  division    Division   @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  isMandatory Boolean    @default(false)
+  
+  @@id([courseId, divisionId])
+}
+
+// Gamification
+model Badge {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String?
+  icon        String      @default("🏆") // emoji or icon name
+  criteria    String      // e.g., "complete_1_course", "complete_5_courses"
+  points      Int         @default(100)
+  createdAt   DateTime    @default(now())
+  
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+  
+  @@unique([userId, badgeId])
+}
+
+// ========== DIGITAL LIBRARY ==========
+
+enum ResourceType {
+  EBOOK
+  ARTICLE
+  VIDEO
+  AUDIO
+  LINK
+}
+
+enum ResourceAccess {
+  PUBLIC
+  DIVISION
+  ROLE
+}
+
+model ResourceCategory {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  icon        String     @default("📁")
+  createdAt   DateTime   @default(now())
+  
+  resources   Resource[]
+}
+
+model Resource {
+  id           String         @id @default(uuid())
+  title        String
+  description  String?        @db.Text
+  type         ResourceType   @default(EBOOK)
+  fileUrl      String?        // For uploaded files
+  externalUrl  String?        // For external links/videos
+  thumbnail    String?
+  author       String?
+  tags         String?        // Comma separated tags
+  fileSize     Int?           // In bytes
+  duration     String?        // For video/audio (e.g. "1h 30m")
+  pageCount    Int?           // For ebooks
+  
+  categoryId   String?
+  category     ResourceCategory? @relation(fields: [categoryId], references: [id])
+  
+  accessType   ResourceAccess @default(PUBLIC)
+  divisionId   String?        // If access is DIVISION
+  requiredRole Role?          // If access is ROLE
+  
+  views        Int            @default(0)
+  downloads    Int            @default(0)
+  featured     Boolean        @default(false)
+  
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  
+  bookmarks    ResourceBookmark[]
+  progress     ReadingProgress[]
+  activities   LibraryActivity[]
+}
+
+model ResourceBookmark {
+  id         String   @id @default(uuid())
+  userId     String
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  
+  @@unique([userId, resourceId])
+}
+
+model ReadingProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  progress    Int      @default(0)  // 0-100 percentage
+  lastPage    Int?     // For ebooks
+  lastPosition Int?    // For video/audio in seconds
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, resourceId])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  senderId  String
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String? // Null for public/broadcast (if needed later)
+  receiver  User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum LibraryActivityType {
+  VIEW
+  DOWNLOAD
+  READ
+  BOOKMARK
+}
+
+model LibraryActivity {
+  id         String              @id @default(uuid())
+  userId     String
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId String
+  resource   Resource            @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  type       LibraryActivityType
+  createdAt  DateTime            @default(now())
+
+  @@index([userId])
+  @@index([resourceId])
+  @@index([createdAt])
+  @@index([type])
+}

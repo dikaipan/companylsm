@@ -1,0 +1,181 @@
+
+> api@0.0.1 test
+> jest src/discussions/discussions.controller.spec.ts
+
+FAIL src/discussions/discussions.controller.spec.ts
+  DiscussionsController
+    √ should be defined (11 ms)
+    create
+      × should create a discussion post (6 ms)
+    findByCourse
+      × should return discussions for a course (3 ms)
+    findOne
+      √ should return a single discussion (2 ms)
+      × should return error if not found (2 ms)
+    reply
+      × should create a reply to a discussion (2 ms)
+      √ should return error if parent not found (2 ms)
+    delete
+      × should allow owner to delete their post (1 ms)
+      × should allow admin to delete any post (1 ms)
+      × should not allow non-owner non-admin to delete (2 ms)
+
+  ● DiscussionsController › create › should create a discussion post
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+      Object {
+        "data": Object {
+          "content": "Hello world",
+          "courseId": "course-1",
+    +     "parentId": undefined,
+          "userId": "user-1",
+    +   },
+    +   "include": Object {
+    +     "user": Object {
+    +       "select": Object {
+    +         "email": true,
+    +         "id": true,
+    +         "name": true,
+    +       },
+    +     },
+        },
+      },
+
+    Number of calls: 1
+
+    [0m [90m 63 |[39m       )[33m;[39m
+     [90m 64 |[39m       expect(result)[33m.[39mtoEqual(expected)[33m;[39m
+    [31m[1m>[22m[39m[90m 65 |[39m       expect(mockPrisma[33m.[39mdiscussion[33m.[39mcreate)[33m.[39mtoHaveBeenCalledWith({
+     [90m    |[39m                                            [31m[1m^[22m[39m
+     [90m 66 |[39m         data[33m:[39m {
+     [90m 67 |[39m           content[33m:[39m createDto[33m.[39mcontent[33m,[39m
+     [90m 68 |[39m           courseId[33m:[39m createDto[33m.[39mcourseId[33m,[39m[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:65:44)
+
+  ● DiscussionsController › findByCourse › should return discussions for a course
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+    @@ -1,7 +1,12 @@
+      Object {
+        "include": Object {
+    +     "_count": Object {
+    +       "select": Object {
+    +         "replies": true,
+    +       },
+    +     },
+          "replies": Object {
+            "include": Object {
+              "user": Object {
+                "select": Object {
+                  "email": true,,
+
+    Number of calls: 1
+
+    [0m [90m 94 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m controller[33m.[39mfindByCourse([32m'course-1'[39m)[33m;[39m
+     [90m 95 |[39m       expect(result)[33m.[39mtoEqual(discussions)[33m;[39m
+    [31m[1m>[22m[39m[90m 96 |[39m       expect(mockPrisma[33m.[39mdiscussion[33m.[39mfindMany)[33m.[39mtoHaveBeenCalledWith({
+     [90m    |[39m                                              [31m[1m^[22m[39m
+     [90m 97 |[39m         where[33m:[39m { courseId[33m:[39m [32m'course-1'[39m[33m,[39m parentId[33m:[39m [36mnull[39m }[33m,[39m
+     [90m 98 |[39m         include[33m:[39m {
+     [90m 99 |[39m           user[33m:[39m { select[33m:[39m { id[33m:[39m [36mtrue[39m[33m,[39m name[33m:[39m [36mtrue[39m[33m,[39m email[33m:[39m [36mtrue[39m } }[33m,[39m[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:96:46)
+
+  ● DiscussionsController › findOne › should return error if not found
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"error": "Discussion not found"}
+    Received: null
+
+    [0m [90m 127 |[39m
+     [90m 128 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m controller[33m.[39mfindOne([32m'invalid-id'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 129 |[39m       expect(result)[33m.[39mtoEqual({ error[33m:[39m [32m'Discussion not found'[39m })[33m;[39m
+     [90m     |[39m                      [31m[1m^[22m[39m
+     [90m 130 |[39m     })[33m;[39m
+     [90m 131 |[39m   })[33m;[39m
+     [90m 132 |[39m[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:129:22)
+
+  ● DiscussionsController › reply › should create a reply to a discussion
+
+    TypeError: Cannot read properties of undefined (reading 'substring')
+
+    [0m [90m 156 |[39m         userId[33m:[39m parent[33m.[39muserId[33m,[39m
+     [90m 157 |[39m         title[33m:[39m [32m'New Reply to your Discussion'[39m[33m,[39m
+    [31m[1m>[22m[39m[90m 158 |[39m         message[33m:[39m [32m`${req.user.name || 'Someone'} replied to your post: "${parent.content.substring(0, 30)}..."`[39m[33m,[39m
+     [90m     |[39m                                                                                         [31m[1m^[22m[39m
+     [90m 159 |[39m         type[33m:[39m [32m'info'[39m[33m,[39m
+     [90m 160 |[39m         link[33m:[39m [32m`/courses/${parent.courseId}?tab=discussions`[39m[33m,[39m
+     [90m 161 |[39m       })[33m;[39m[0m
+
+      at DiscussionsController.reply (discussions/discussions.controller.ts:158:89)
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:142:22)
+
+  ● DiscussionsController › delete › should allow owner to delete their post
+
+    TypeError: this.prisma.discussion.deleteMany is not a function
+
+    [0m [90m 188 |[39m
+     [90m 189 |[39m     [90m// Delete all replies first (cascading)[39m
+    [31m[1m>[22m[39m[90m 190 |[39m     [36mawait[39m [36mthis[39m[33m.[39mprisma[33m.[39mdiscussion[33m.[39mdeleteMany({
+     [90m     |[39m                                  [31m[1m^[22m[39m
+     [90m 191 |[39m       where[33m:[39m { parentId[33m:[39m id }[33m,[39m
+     [90m 192 |[39m     })[33m;[39m
+     [90m 193 |[39m[0m
+
+      at DiscussionsController.delete (discussions/discussions.controller.ts:190:34)
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:168:22)
+
+  ● DiscussionsController › delete › should allow admin to delete any post
+
+    TypeError: this.prisma.discussion.deleteMany is not a function
+
+    [0m [90m 188 |[39m
+     [90m 189 |[39m     [90m// Delete all replies first (cascading)[39m
+    [31m[1m>[22m[39m[90m 190 |[39m     [36mawait[39m [36mthis[39m[33m.[39mprisma[33m.[39mdiscussion[33m.[39mdeleteMany({
+     [90m     |[39m                                  [31m[1m^[22m[39m
+     [90m 191 |[39m       where[33m:[39m { parentId[33m:[39m id }[33m,[39m
+     [90m 192 |[39m     })[33m;[39m
+     [90m 193 |[39m[0m
+
+      at DiscussionsController.delete (discussions/discussions.controller.ts:190:34)
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:177:22)
+
+  ● DiscussionsController › delete › should not allow non-owner non-admin to delete
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "error": "Unauthorized",
+    +   "error": "Not authorized to delete this discussion",
+      }
+
+    [0m [90m 184 |[39m
+     [90m 185 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m controller[33m.[39m[36mdelete[39m([32m'disc-1'[39m[33m,[39m { user[33m:[39m mockUser })[33m;[39m
+    [31m[1m>[22m[39m[90m 186 |[39m       expect(result)[33m.[39mtoEqual({ error[33m:[39m [32m'Unauthorized'[39m })[33m;[39m
+     [90m     |[39m                      [31m[1m^[22m[39m
+     [90m 187 |[39m     })[33m;[39m
+     [90m 188 |[39m   })[33m;[39m
+     [90m 189 |[39m })[33m;[39m[0m
+
+      at Object.<anonymous> (discussions/discussions.controller.spec.ts:186:22)
+
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 3 passed, 10 total
+Snapshots:   0 total
+Time:        0.983 s, estimated 1 s
+Ran all test suites matching src/discussions/discussions.controller.spec.ts.

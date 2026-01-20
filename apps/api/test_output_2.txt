@@ -1,0 +1,61 @@
+
+> api@0.0.1 test
+> jest src/discussions/discussions.controller.spec.ts
+
+FAIL src/discussions/discussions.controller.spec.ts
+  ● Test suite failed to run
+
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m69[0m:[93m19[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m69[0m           courseId: createDto.courseId,
+    [7m  [0m [91m                  ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m70[0m:[93m19[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m70[0m             userId: mockUser.userId,
+    [7m  [0m [91m                  ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m71[0m:[93m23[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m71[0m               parentId: undefined,
+    [7m  [0m [91m                      ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m72[0m:[93m9[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+    [7m72[0m         },
+    [7m  [0m [91m        ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m72[0m:[93m10[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m72[0m         },
+    [7m  [0m [91m         ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m75[0m:[93m35[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m75[0m           select: { id: true, name: true, email: true },
+    [7m  [0m [91m                                  ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m75[0m:[93m48[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+    [7m75[0m           select: { id: true, name: true, email: true },
+    [7m  [0m [91m                                               ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m75[0m:[93m56[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m75[0m           select: { id: true, name: true, email: true },
+    [7m  [0m [91m                                                       ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m76[0m:[93m10[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m76[0m         },
+    [7m  [0m [91m         ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m77[0m:[93m8[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m77[0m       },
+    [7m  [0m [91m       ~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m204[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m204[0m });
+    [7m   [0m [91m~[0m
+    [96msrc/discussions/discussions.controller.spec.ts[0m:[93m204[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+    [7m204[0m });
+    [7m   [0m [91m ~[0m
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.524 s, estimated 1 s
+Ran all test suites matching src/discussions/discussions.controller.spec.ts.
